@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../foreword.html">Foreword</a></li><li class="chapter-item expanded affix "><a href="../getting-started.html">Getting Started</a></li><li class="chapter-item expanded "><a href="../introduction/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../introduction/components.html"><strong aria-hidden="true">1.1.</strong> Components</a></li></ol></li><li class="chapter-item expanded "><a href="../ble/index.html"><strong aria-hidden="true">2.</strong> Ballot-Leader Election</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../ble/configuration.html"><strong aria-hidden="true">2.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../ble/timer.html"><strong aria-hidden="true">2.2.</strong> Tick Timer</a></li></ol></li><li class="chapter-item expanded "><a href="../omnipaxos/index.html"><strong aria-hidden="true">3.</strong> OmniPaxos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../omnipaxos/communication.html"><strong aria-hidden="true">3.1.</strong> Communication</a></li><li class="chapter-item expanded "><a href="../omnipaxos/logging.html"><strong aria-hidden="true">3.2.</strong> Logging</a></li><li class="chapter-item expanded "><a href="../omnipaxos/configuration.html"><strong aria-hidden="true">3.3.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../omnipaxos/storage.html" class="active"><strong aria-hidden="true">3.4.</strong> Storage</a></li><li class="chapter-item expanded "><a href="../omnipaxos/garbage-collection.html"><strong aria-hidden="true">3.5.</strong> Garbage Collection</a></li></ol></li><li class="chapter-item expanded "><a href="../project.html">Project Info</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../foreword.html">Foreword</a></li><li class="chapter-item expanded affix "><a href="../getting-started.html">Getting Started</a></li><li class="chapter-item expanded "><a href="../introduction/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../introduction/components.html"><strong aria-hidden="true">1.1.</strong> Components</a></li></ol></li><li class="chapter-item expanded "><a href="../ble/index.html"><strong aria-hidden="true">2.</strong> Ballot-Leader Election</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../ble/configuration.html"><strong aria-hidden="true">2.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../ble/timer.html"><strong aria-hidden="true">2.2.</strong> Tick Timer</a></li></ol></li><li class="chapter-item expanded "><a href="../omnipaxos/index.html"><strong aria-hidden="true">3.</strong> OmniPaxos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../omnipaxos/communication.html"><strong aria-hidden="true">3.1.</strong> Communication</a></li><li class="chapter-item expanded "><a href="../omnipaxos/round.html"><strong aria-hidden="true">3.2.</strong> Round</a></li><li class="chapter-item expanded "><a href="../omnipaxos/logging.html"><strong aria-hidden="true">3.3.</strong> Logging</a></li><li class="chapter-item expanded "><a href="../omnipaxos/configuration.html"><strong aria-hidden="true">3.4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../omnipaxos/storage.html" class="active"><strong aria-hidden="true">3.5.</strong> Storage</a></li><li class="chapter-item expanded "><a href="../omnipaxos/garbage-collection.html"><strong aria-hidden="true">3.6.</strong> Garbage Collection</a></li></ol></li><li class="chapter-item expanded "><a href="../project.html">Project Info</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -149,6 +149,48 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="storage"><a class="header" href="#storage">Storage</a></h1>
+<p>OmniPaxos comes with an abstraction layer for the storage. This allows the user to store the decided sequences and the state of the replicas in memory or on the storage.</p>
+<p>By default OmniPaxos comes with an in-memory storage option which can be passed as an argument to the OmniPaxos constructor.</p>
+<pre><code class="language-rust edition2018 no_run noplaypen">Storage::with(
+    MemorySequence::&lt;Ballot&gt;::new(),
+    MemoryState::&lt;Ballot&gt;::new(),
+)
+</code></pre>
+<h2 id="custom-storage"><a class="header" href="#custom-storage">Custom Storage</a></h2>
+<p>Sometimes the default storage provided is not sufficient for a particular application. The user might have more storage than RAM memory or they would like to do additional processing before storing.</p>
+<p>To implement a storage component for OmniPaxos the traits <code>PaxosState&lt;R&gt;</code> and <code>Sequence&lt;R&gt;</code> need to be implemented.</p>
+<pre><code class="language-rust edition2018 no_run noplaypen">#[derive(Debug)]
+pub struct MemorySequence&lt;R&gt;
+where
+    R: Round,
+{
+    sequence: Vec&lt;Entry&lt;R&gt;&gt;,
+}
+
+impl&lt;R&gt; Sequence&lt;R&gt; for MemorySequence&lt;R&gt;
+where
+    R: Round,
+{ ... }
+
+--------------------------------------------
+
+#[derive(Debug)]
+pub struct MemoryState&lt;R&gt;
+where
+    R: Round,
+{
+    n_prom: R,
+    acc_round: R,
+    ld: u64,
+    gc_idx: u64,
+    max_promise_sfx: Vec&lt;Entry&lt;R&gt;&gt;,
+}
+
+impl&lt;R&gt; PaxosState&lt;R&gt; for MemoryState&lt;R&gt;
+where
+    R: Round,
+{ ... }
+</code></pre>
 
                     </main>
 

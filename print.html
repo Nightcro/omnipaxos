@@ -85,7 +85,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="foreword.html">Foreword</a></li><li class="chapter-item expanded affix "><a href="getting-started.html">Getting Started</a></li><li class="chapter-item expanded "><a href="introduction/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="introduction/components.html"><strong aria-hidden="true">1.1.</strong> Components</a></li></ol></li><li class="chapter-item expanded "><a href="ble/index.html"><strong aria-hidden="true">2.</strong> Ballot-Leader Election</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ble/configuration.html"><strong aria-hidden="true">2.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="ble/timer.html"><strong aria-hidden="true">2.2.</strong> Tick Timer</a></li></ol></li><li class="chapter-item expanded "><a href="omnipaxos/index.html"><strong aria-hidden="true">3.</strong> OmniPaxos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="omnipaxos/communication.html"><strong aria-hidden="true">3.1.</strong> Communication</a></li><li class="chapter-item expanded "><a href="omnipaxos/logging.html"><strong aria-hidden="true">3.2.</strong> Logging</a></li><li class="chapter-item expanded "><a href="omnipaxos/configuration.html"><strong aria-hidden="true">3.3.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="omnipaxos/storage.html"><strong aria-hidden="true">3.4.</strong> Storage</a></li><li class="chapter-item expanded "><a href="omnipaxos/garbage-collection.html"><strong aria-hidden="true">3.5.</strong> Garbage Collection</a></li></ol></li><li class="chapter-item expanded "><a href="project.html">Project Info</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="foreword.html">Foreword</a></li><li class="chapter-item expanded affix "><a href="getting-started.html">Getting Started</a></li><li class="chapter-item expanded "><a href="introduction/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="introduction/components.html"><strong aria-hidden="true">1.1.</strong> Components</a></li></ol></li><li class="chapter-item expanded "><a href="ble/index.html"><strong aria-hidden="true">2.</strong> Ballot-Leader Election</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ble/configuration.html"><strong aria-hidden="true">2.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="ble/timer.html"><strong aria-hidden="true">2.2.</strong> Tick Timer</a></li></ol></li><li class="chapter-item expanded "><a href="omnipaxos/index.html"><strong aria-hidden="true">3.</strong> OmniPaxos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="omnipaxos/communication.html"><strong aria-hidden="true">3.1.</strong> Communication</a></li><li class="chapter-item expanded "><a href="omnipaxos/round.html"><strong aria-hidden="true">3.2.</strong> Round</a></li><li class="chapter-item expanded "><a href="omnipaxos/logging.html"><strong aria-hidden="true">3.3.</strong> Logging</a></li><li class="chapter-item expanded "><a href="omnipaxos/configuration.html"><strong aria-hidden="true">3.4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="omnipaxos/storage.html"><strong aria-hidden="true">3.5.</strong> Storage</a></li><li class="chapter-item expanded "><a href="omnipaxos/garbage-collection.html"><strong aria-hidden="true">3.6.</strong> Garbage Collection</a></li></ol></li><li class="chapter-item expanded "><a href="project.html">Project Info</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -173,45 +173,6 @@ To do so add the following to your Cargo.toml instead:</p>
 <pre><code class="language-toml">[dependencies]
 omnipaxos = { git = &quot;https://github.com/haraldng/omnipaxos&quot; }
 </code></pre>
-<!-- ## Hello World
-
-With the above, you are set to run the simplest of OmniPaxos projects, the venerable "Hello World".
-
-Create a new executable file, such as `main.rs`, and write a very simple component that just logs "Hello World" at the `info` level when it's started and ignores all other messages and events: 
-
-```rust,edition2018,no_run,noplaypen
-{{#rustdoc_include ../examples/src/bin/helloworld.rs:component}}
-```
-
-In order to start our component, we need a Kompact system, which we will create from a default configuration.
-And then we just wait for the component to do its work and shut the system down again:
-
-```rust,edition2018,no_run,noplaypen
-{{#rustdoc_include ../examples/src/bin/helloworld.rs:main}}
-```
-
-The `await_termination()` call blocks the main-thread while the Kompact system is operating on its own thread pool. We will get into more details on scheduling and thread pools a bit later in this tutorial. For now it is sufficient to know, that once the Kompact system has been shut down by our `HelloWorldComponent` using `shutdown_async()`, the main-thread will eventually continue.
-
-We can run this code, depending on how you set up your project, with:
-```bash
-cargo run --release
-```
-This will give us something like the following output:
-```bash
-lkroll $ cargo run --release --bin helloworld
-    Finished release [optimized] target(s) in 0.09s
-     Running `/Users/lkroll/Programming/Kompics/kompact/target/release/helloworld`
-Jul 07 16:28:45.870 INFO Hello World!, ctype: HelloWorldComponent, cid: 804ed483-54d5-41ab-ad8f-145f90bc7b45, system: kompact-runtime-1, location: docs/examples/src/bin/helloworld.rs:17
-```
-
-We can see the "Hello World" being logged, alongside a bunch of other contextual information that is automatically inserted by the runtime, such as the type name of the component doing the logging (`ctype`), the unique id of the component (`cid`) which differentiates from other instances of the same type, the name of the Kompact `system`, as well as the concrete location in the file where the logging statement occurs.
-
-If we run in debug mode, instead of release, using the simple `cargo run` we get a lot of additional output at the `debug` level, concerning system and component lifecycle – more on that later.
-
-> **Note:** If you have checked out the [examples folder](https://github.com/kompics/kompact/tree/master/docs/examples) and are trying to run from there, you need to specify the concrete binary with:
-> ```bash
-> cargo run --release --bin helloworld
-> ``` -->
 <div style="break-before: page; page-break-before: always;"></div><h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
 <p>In this section of the tutorial we will discuss the model assumptions and concepts that are underlying the implementation of OmniPaxos. We will look at how the <a href="introduction/../omnipaxos/index.html"><code>OmniPaxos</code></a> and <a href="introduction/../ble/index.html"><code>Ballot Leader Election</code></a> modules communicate between them, while also providing examples for the user utilising an actor framework such as <a href="https://github.com/kompics/kompact">Kompact</a>.</p>
 <p>At a high level, OmniPaxos is simply an abstractization layer for the <a href="https://arxiv.org/pdf/2008.13456.pdf">Leader-based Sequence Paxos</a>. It provides all the necessary functions to run a distributed system. It is capable of deciding on a series of events, electing new leaders, reconfiguration and basic garbage collection.</p>
@@ -278,7 +239,7 @@ BallotLeaderElection::with_hocon(
 <div style="break-before: page; page-break-before: always;"></div><h1 id="tick-timer"><a class="header" href="#tick-timer">Tick Timer</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="omnipaxos-1"><a class="header" href="#omnipaxos-1">OmniPaxos</a></h1>
 <p>In this section we will introduce the features of OmniPaxos in detail.</p>
-<p>In particular, we will talk about <a href="omnipaxos/communication.html">communication</a>, as well as how to <a href="omnipaxos/configuration.html">configure</a> it, before describing some of the advanced options for Omnipaxos, such as <a href="omnipaxos/garbage-collection.html">garbage collection</a>, <a href="omnipaxos/logging.html">logging</a>, and <a href="omnipaxos/storage.html">storage</a>.</p>
+<p>In particular, we will talk about <a href="omnipaxos/communication.html">communication</a>, <a href="omnipaxos/round.html">round</a>, as well as how to <a href="omnipaxos/configuration.html">configure</a> it, before describing some of the advanced options for Omnipaxos, such as <a href="omnipaxos/garbage-collection.html">garbage collection</a>, <a href="omnipaxos/logging.html">logging</a>, and <a href="omnipaxos/storage.html">storage</a>.</p>
 <p>As the library is based on the <a href="https://arxiv.org/pdf/2008.13456.pdf">Leader-based Sequence Paxos</a> algorithm we will give an onverview of the properties it has to adhere to.</p>
 <p>The Leader-Based Sequence Consensus algorithm is used to achieve replication inside of a partition. It ensures that a leader, which is elected utilising a different component, proposes an operation and it will be committed only when a consensus is achieved by the majority. At the same time a sequence is stored inside each replica. By utilising a leader we assure that only one operation will be decided at a point in time which also ensures the linearizability of the system.</p>
 <p>By implementing the Leader-Based Sequence Consensus, the system has to abide the following properties:</p>
@@ -289,6 +250,11 @@ BallotLeaderElection::with_hocon(
 <li><strong>Termination</strong>: If command C is proposed by a correct process then eventually every correct process decides a sequence containing C.</li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="communication"><a class="header" href="#communication">Communication</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="round"><a class="header" href="#round">Round</a></h1>
+<p>Leader event that indicates a leader has been elected. Should be created when the user-defined BLE algorithm outputs a leader event. Should be then handled in Omni-Paxos by calling <code>crate::omnipaxos::OmniPaxos::handle_leader()</code>.</p>
+<blockquote>
+<p><strong>Note:</strong> Rounds in Omni-Paxos are totally ordered.</p>
+</blockquote>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="logging"><a class="header" href="#logging">Logging</a></h1>
 <p>OmniPaxos uses the <a href="https://crates.io/crates/slog">slog</a> crate to provide system wide logging facilities. Logging works out of the box with a default asynchronous console and file logger implementation that roughly corresponds to the following setup code:</p>
 <pre><code class="language-rust edition2018 no_run noplaypen">let path = std::path::Path::new(file_path);
@@ -355,7 +321,57 @@ let replica = OmniPaxos::with(
 </blockquote>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="omnipaxos-configuration"><a class="header" href="#omnipaxos-configuration">OmniPaxos Configuration</a></h1>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="storage"><a class="header" href="#storage">Storage</a></h1>
+<p>OmniPaxos comes with an abstraction layer for the storage. This allows the user to store the decided sequences and the state of the replicas in memory or on the storage.</p>
+<p>By default OmniPaxos comes with an in-memory storage option which can be passed as an argument to the OmniPaxos constructor.</p>
+<pre><code class="language-rust edition2018 no_run noplaypen">Storage::with(
+    MemorySequence::&lt;Ballot&gt;::new(),
+    MemoryState::&lt;Ballot&gt;::new(),
+)
+</code></pre>
+<h2 id="custom-storage"><a class="header" href="#custom-storage">Custom Storage</a></h2>
+<p>Sometimes the default storage provided is not sufficient for a particular application. The user might have more storage than RAM memory or they would like to do additional processing before storing.</p>
+<p>To implement a storage component for OmniPaxos the traits <code>PaxosState&lt;R&gt;</code> and <code>Sequence&lt;R&gt;</code> need to be implemented.</p>
+<pre><code class="language-rust edition2018 no_run noplaypen">#[derive(Debug)]
+pub struct MemorySequence&lt;R&gt;
+where
+    R: Round,
+{
+    sequence: Vec&lt;Entry&lt;R&gt;&gt;,
+}
+
+impl&lt;R&gt; Sequence&lt;R&gt; for MemorySequence&lt;R&gt;
+where
+    R: Round,
+{ ... }
+
+--------------------------------------------
+
+#[derive(Debug)]
+pub struct MemoryState&lt;R&gt;
+where
+    R: Round,
+{
+    n_prom: R,
+    acc_round: R,
+    ld: u64,
+    gc_idx: u64,
+    max_promise_sfx: Vec&lt;Entry&lt;R&gt;&gt;,
+}
+
+impl&lt;R&gt; PaxosState&lt;R&gt; for MemoryState&lt;R&gt;
+where
+    R: Round,
+{ ... }
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="garbage-collection"><a class="header" href="#garbage-collection">Garbage Collection</a></h1>
+<p>In some cases the decided sequence can become very become large and a portion of the sequence needs to be deleted. To solve this Omnipaxos offers a manual garbage collection.</p>
+<pre><code class="language-rust edition2018 no_run noplaypen">/// `index` - Deletes all entries up to index, if the index is None then the minimum index accepted by ALL servers will be used as the index.
+crate::omnipaxos::OmniPaxos::garbage_collect(index)
+</code></pre>
+<p>The function can be called from any replica. If the replica which initiates the garbage collection is not the leader then it will redirect the proposal for garbage collection to the leader which in turn will initiate the garbage collection for all the replicas in the system.</p>
+<blockquote>
+<p><strong>Note:</strong> At the moment there is no way of knowing if the garbage collection has been completed succesfully. The only method would be to get the garbage_collected_idx and see if it is equal to the given index.</p>
+</blockquote>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="project-info"><a class="header" href="#project-info">Project Info</a></h1>
 <p>While OmniPaxos is primarily being developed at the <a href="https://www.kth.se/en">KTH Royal Institute of Technology</a> and at <a href="https://www.ri.se/en">RISE Research Institutes of Sweden</a> in Stockholm, Sweden, we do wish to thank all <a href="https://github.com/haraldng/omnipaxos/graphs/contributors">contributors</a>.</p>
 <h2 id="releases"><a class="header" href="#releases">Releases</a></h2>
