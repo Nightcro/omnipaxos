@@ -223,33 +223,65 @@ BallotLeaderElection::with_hocon(
 )
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="ballot-leader-election-1"><a class="header" href="#ballot-leader-election-1">Ballot Leader Election</a></h1>
-<p>In this section we will introduce the features of Ballot Leader Election in detail.</p>
+<p>In this section we will introduce the features of <strong>Ballot Leader Election</strong> in detail.</p>
 <p>In particular, we will talk about how the BLE’s internal <a href="ble/timer.html">tick timer</a> works, how to <a href="ble/configuration.html">configure</a> it.</p>
 <blockquote>
 <p><strong>Note:</strong> The <a href="ble/../omnipaxos/logging.html">logger</a> for the <strong>Ballot Leader Election</strong> is the same as the one in <strong>OmniPaxos</strong>.</p>
 </blockquote>
 <p>A leader is elected by the component which runs the Ballot Leader Election with Gossiping algorithm. It ensures that only one leader is chosen by every process and if the leader crashes a new leader is elected.</p>
-<p>By implementing the Ballot Leader Election with Gossiping, the system has to abide the following properties:</p>
-<ul>
-<li><strong>BLE1 Completness</strong>: Eventually every correct process trusts some correct process if a majority are correct.</li>
-<li><strong>BLE2 Eventual Agreement</strong>:  Eventually no two correct correct processes trust different correct processes.</li>
-<li><strong>BLE3 Monotonic unique ballots</strong>: If a process L with ballot n is elected as leader by $p_{i}$, all previously elected leaders by $p_{i}$ have ballot numbers less than n, and (L, n) is a unique number. </li>
-</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="ballot-leader-election-configuration"><a class="header" href="#ballot-leader-election-configuration">Ballot Leader Election Configuration</a></h1>
+<p>To ease up the configuration of the Ballot Leader Election module, a hocon configuration can be provided.</p>
+<ul>
+<li><strong>CONFIG_ID</strong> - The identifier for the configuration that this Omni-Paxos replica is part of.</li>
+<li><strong>PID</strong> - The identifier of this replica.</li>
+<li><strong>HB_DELAY</strong> - A fixed delay between heartbeats. It is measured in ticks.</li>
+<li><strong>INCREMENT_DELAY</strong> - A fixed delay that is added to the hb_delay. It is measured in ticks.</li>
+<li><strong>INITIAL_DELAY_FACTOR</strong> - A factor used in the beginning for a shorter hb_delay.</li>
+<li><strong>LOG_FILE_PATH</strong> - Path where the default logger logs events.</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="tick-timer"><a class="header" href="#tick-timer">Tick Timer</a></h1>
+<p>The <strong>Ballot Leader Election</strong> does not use timers as there is no available implementation in the official library of Rust. To overcome the use of external libraries the BLE module offers a implementation based on ticks.</p>
+<p>If the user has access to the <a href="https://github.com/kompics/kompact">Kompact</a> framework. Then he would be able to use the representation of timers it comes with.</p>
+<p>In the example below we have a timer which repeats the provided function once every 100ms and the heartbeat delay would be 5 ticks, then the heartbeat timeout would happen once every 500ms.</p>
+<pre><code class="language-rust edition2018 no_run noplaypen">const BLE_TIMER_TIMEOUT: Duration = Duration::from_millis(100);
+self.schedule_periodic(BLE_TIMER_TIMEOUT, BLE_TIMER_TIMEOUT, move |c, _| {
+    let leader = c.ble.tick();
+    c.ble.get_outgoing_msgs();
+
+    Handled::Ok
+}),
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="omnipaxos-1"><a class="header" href="#omnipaxos-1">OmniPaxos</a></h1>
 <p>In this section we will introduce the features of OmniPaxos in detail.</p>
 <p>In particular, we will talk about <a href="omnipaxos/communication.html">communication</a>, <a href="omnipaxos/round.html">round</a>, as well as how to <a href="omnipaxos/configuration.html">configure</a> it, before describing some of the advanced options for Omnipaxos, such as <a href="omnipaxos/garbage-collection.html">garbage collection</a>, <a href="omnipaxos/logging.html">logging</a>, and <a href="omnipaxos/storage.html">storage</a>.</p>
 <p>As the library is based on the <a href="https://arxiv.org/pdf/2008.13456.pdf">Leader-based Sequence Paxos</a> algorithm we will give an onverview of the properties it has to adhere to.</p>
 <p>The Leader-Based Sequence Consensus algorithm is used to achieve replication inside of a partition. It ensures that a leader, which is elected utilising a different component, proposes an operation and it will be committed only when a consensus is achieved by the majority. At the same time a sequence is stored inside each replica. By utilising a leader we assure that only one operation will be decided at a point in time which also ensures the linearizability of the system.</p>
-<p>By implementing the Leader-Based Sequence Consensus, the system has to abide the following properties:</p>
-<ul>
-<li><strong>Validity</strong>: If a process decides v then v is a sequence of proposed commands (without duplicates).</li>
-<li><strong>Uniform Agreement</strong>: If a process p decides u and process q decides v then one is a prefix of the other.</li>
-<li><strong>Integrity</strong>: If process p decides u and later decides v then u is a strict prefix of v.</li>
-<li><strong>Termination</strong>: If command C is proposed by a correct process then eventually every correct process decides a sequence containing C.</li>
-</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="communication"><a class="header" href="#communication">Communication</a></h1>
+<p>By default, OmniPaxos does not implement any network dispatcher. It is up to the user to provide an implementation of the network.</p>
+<p>Let us assume we have a network dispatcher courtesy of <a href="https://github.com/kompics/kompact">Kompact</a>.</p>
+<pre><code class="language-rust edition2018 no_run noplaypen">peers: HashMap&lt;u64, ActorRef&lt;BLEMessage&gt;&gt;,
+
+fn send_outgoing_msgs(&amp;mut self) {
+    let outgoing = self.paxos.get_outgoing_msgs();
+
+    for out in outgoing {
+        let receiver = self.peers.get(&amp;out.to).unwrap();
+
+        receiver.tell(out);
+    }
+}
+
+self.schedule_periodic(
+    Duration::from_millis(1),
+    Duration::from_millis(1),
+    move |c, _| {
+        c.send_outgoing_msgs();
+
+        Handled::Ok
+    },
+)
+</code></pre>
+<p>In the example above we schedule a timer once every 1ms to extract a vector of messages (outgoing queue) from inside of a paxos replica, then we iterate through each message and send it through the network to the target replica.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="round"><a class="header" href="#round">Round</a></h1>
 <p>Leader event that indicates a leader has been elected. Should be created when the user-defined BLE algorithm outputs a leader event. Should be then handled in Omni-Paxos by calling <code>crate::omnipaxos::OmniPaxos::handle_leader()</code>.</p>
 <blockquote>
@@ -320,6 +352,12 @@ let replica = OmniPaxos::with(
 <p><strong>Note:</strong> The custom logger can be created for the <a href="omnipaxos/../ble/index.html"><strong>Ballot Leader Election</strong></a> module as well.</p>
 </blockquote>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="omnipaxos-configuration"><a class="header" href="#omnipaxos-configuration">OmniPaxos Configuration</a></h1>
+<p>To ease up the configuration of the OmniPaxos replica, a hocon configuration can be provided with the following keys set:</p>
+<ul>
+<li><strong>CONFIG_ID</strong> - The identifier for the configuration that this Omni-Paxos replica is part of.</li>
+<li><strong>PID</strong> - The identifier of this replica.</li>
+<li><strong>LOG_FILE_PATH</strong> - Path where the default logger logs events.</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="storage"><a class="header" href="#storage">Storage</a></h1>
 <p>OmniPaxos comes with an abstraction layer for the storage. This allows the user to store the decided sequences and the state of the replicas in memory or on the storage.</p>
 <p>By default OmniPaxos comes with an in-memory storage option which can be passed as an argument to the OmniPaxos constructor.</p>

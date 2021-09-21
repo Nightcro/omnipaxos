@@ -149,6 +149,17 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="tick-timer"><a class="header" href="#tick-timer">Tick Timer</a></h1>
+<p>The <strong>Ballot Leader Election</strong> does not use timers as there is no available implementation in the official library of Rust. To overcome the use of external libraries the BLE module offers a implementation based on ticks.</p>
+<p>If the user has access to the <a href="https://github.com/kompics/kompact">Kompact</a> framework. Then he would be able to use the representation of timers it comes with.</p>
+<p>In the example below we have a timer which repeats the provided function once every 100ms and the heartbeat delay would be 5 ticks, then the heartbeat timeout would happen once every 500ms.</p>
+<pre><code class="language-rust edition2018 no_run noplaypen">const BLE_TIMER_TIMEOUT: Duration = Duration::from_millis(100);
+self.schedule_periodic(BLE_TIMER_TIMEOUT, BLE_TIMER_TIMEOUT, move |c, _| {
+    let leader = c.ble.tick();
+    c.ble.get_outgoing_msgs();
+
+    Handled::Ok
+}),
+</code></pre>
 
                     </main>
 

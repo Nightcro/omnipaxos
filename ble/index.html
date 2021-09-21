@@ -149,18 +149,12 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="ballot-leader-election"><a class="header" href="#ballot-leader-election">Ballot Leader Election</a></h1>
-<p>In this section we will introduce the features of Ballot Leader Election in detail.</p>
+<p>In this section we will introduce the features of <strong>Ballot Leader Election</strong> in detail.</p>
 <p>In particular, we will talk about how the BLE’s internal <a href="timer.html">tick timer</a> works, how to <a href="configuration.html">configure</a> it.</p>
 <blockquote>
 <p><strong>Note:</strong> The <a href="../omnipaxos/logging.html">logger</a> for the <strong>Ballot Leader Election</strong> is the same as the one in <strong>OmniPaxos</strong>.</p>
 </blockquote>
 <p>A leader is elected by the component which runs the Ballot Leader Election with Gossiping algorithm. It ensures that only one leader is chosen by every process and if the leader crashes a new leader is elected.</p>
-<p>By implementing the Ballot Leader Election with Gossiping, the system has to abide the following properties:</p>
-<ul>
-<li><strong>BLE1 Completness</strong>: Eventually every correct process trusts some correct process if a majority are correct.</li>
-<li><strong>BLE2 Eventual Agreement</strong>:  Eventually no two correct correct processes trust different correct processes.</li>
-<li><strong>BLE3 Monotonic unique ballots</strong>: If a process L with ballot n is elected as leader by $p_{i}$, all previously elected leaders by $p_{i}$ have ballot numbers less than n, and (L, n) is a unique number. </li>
-</ul>
 
                     </main>
 
