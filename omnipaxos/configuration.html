@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../foreword.html">Foreword</a></li><li class="chapter-item expanded affix "><a href="../getting-started.html">Getting Started</a></li><li class="chapter-item expanded "><a href="../introduction/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../introduction/components.html"><strong aria-hidden="true">1.1.</strong> Components</a></li></ol></li><li class="chapter-item expanded "><a href="../ble/index.html"><strong aria-hidden="true">2.</strong> Ballot-Leader Election</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../ble/configuration.html"><strong aria-hidden="true">2.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../ble/timer.html"><strong aria-hidden="true">2.2.</strong> Tick Timer</a></li></ol></li><li class="chapter-item expanded "><a href="../omnipaxos/index.html"><strong aria-hidden="true">3.</strong> OmniPaxos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../omnipaxos/communication.html"><strong aria-hidden="true">3.1.</strong> Communication</a></li><li class="chapter-item expanded "><a href="../omnipaxos/round.html"><strong aria-hidden="true">3.2.</strong> Round</a></li><li class="chapter-item expanded "><a href="../omnipaxos/logging.html"><strong aria-hidden="true">3.3.</strong> Logging</a></li><li class="chapter-item expanded "><a href="../omnipaxos/configuration.html" class="active"><strong aria-hidden="true">3.4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../omnipaxos/storage.html"><strong aria-hidden="true">3.5.</strong> Storage</a></li><li class="chapter-item expanded "><a href="../omnipaxos/garbage-collection.html"><strong aria-hidden="true">3.6.</strong> Garbage Collection</a></li></ol></li><li class="chapter-item expanded "><a href="../project.html">Project Info</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../foreword.html">Foreword</a></li><li class="chapter-item expanded affix "><a href="../getting-started.html">Getting Started</a></li><li class="chapter-item expanded "><a href="../introduction/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../ble/index.html"><strong aria-hidden="true">2.</strong> Ballot Leader Election</a></li><li class="chapter-item expanded "><a href="../omnipaxos/index.html"><strong aria-hidden="true">3.</strong> OmniPaxos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../omnipaxos/communication.html"><strong aria-hidden="true">3.1.</strong> Communication</a></li><li class="chapter-item expanded "><a href="../omnipaxos/round.html"><strong aria-hidden="true">3.2.</strong> Round</a></li><li class="chapter-item expanded "><a href="../omnipaxos/logging.html"><strong aria-hidden="true">3.3.</strong> Logging</a></li><li class="chapter-item expanded "><a href="../omnipaxos/configuration.html" class="active"><strong aria-hidden="true">3.4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../omnipaxos/storage.html"><strong aria-hidden="true">3.5.</strong> Storage</a></li><li class="chapter-item expanded "><a href="../omnipaxos/garbage-collection.html"><strong aria-hidden="true">3.6.</strong> Garbage Collection</a></li></ol></li><li class="chapter-item expanded "><a href="../project.html">Project Info</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -150,11 +150,30 @@
                     <main>
                         <h1 id="omnipaxos-configuration"><a class="header" href="#omnipaxos-configuration">OmniPaxos Configuration</a></h1>
 <p>To ease up the configuration of the OmniPaxos replica, a hocon configuration can be provided with the following keys set:</p>
-<ul>
-<li><strong>CONFIG_ID</strong> - The identifier for the configuration that this Omni-Paxos replica is part of.</li>
-<li><strong>PID</strong> - The identifier of this replica.</li>
-<li><strong>LOG_FILE_PATH</strong> - Path where the default logger logs events.</li>
-</ul>
+<pre><code class="language-json">{
+    // The identifier for the configuration that this Omni-Paxos replica is part of.
+    config_id: 1,
+    // The identifier of this replica.
+    pid: 1,
+    // Path where the default logger logs events.
+    log_file_path: &quot;/paxos/logs&quot;
+}
+</code></pre>
+<pre><code class="language-rust edition2018 no_run noplaypen">// config/my_configuration.txt
+---------------------------------------
+paxos_config: {
+    config_id: 1,
+    pid: 1,
+    log_file_path: &quot;/paxos/logs&quot;
+}
+---------------------------------------
+
+let raw_cfg = HoconLoader::new()
+    .load_file(&quot;config/my_configuration.txt&quot;)?
+    .hocon()?;
+
+let cfg: &amp;Hocon = &amp;raw_cfg[&quot;paxos_config&quot;];
+</code></pre>
 
                     </main>
 

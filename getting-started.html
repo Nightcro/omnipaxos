@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="foreword.html">Foreword</a></li><li class="chapter-item expanded affix "><a href="getting-started.html" class="active">Getting Started</a></li><li class="chapter-item expanded "><a href="introduction/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="introduction/components.html"><strong aria-hidden="true">1.1.</strong> Components</a></li></ol></li><li class="chapter-item expanded "><a href="ble/index.html"><strong aria-hidden="true">2.</strong> Ballot-Leader Election</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="ble/configuration.html"><strong aria-hidden="true">2.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="ble/timer.html"><strong aria-hidden="true">2.2.</strong> Tick Timer</a></li></ol></li><li class="chapter-item expanded "><a href="omnipaxos/index.html"><strong aria-hidden="true">3.</strong> OmniPaxos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="omnipaxos/communication.html"><strong aria-hidden="true">3.1.</strong> Communication</a></li><li class="chapter-item expanded "><a href="omnipaxos/round.html"><strong aria-hidden="true">3.2.</strong> Round</a></li><li class="chapter-item expanded "><a href="omnipaxos/logging.html"><strong aria-hidden="true">3.3.</strong> Logging</a></li><li class="chapter-item expanded "><a href="omnipaxos/configuration.html"><strong aria-hidden="true">3.4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="omnipaxos/storage.html"><strong aria-hidden="true">3.5.</strong> Storage</a></li><li class="chapter-item expanded "><a href="omnipaxos/garbage-collection.html"><strong aria-hidden="true">3.6.</strong> Garbage Collection</a></li></ol></li><li class="chapter-item expanded "><a href="project.html">Project Info</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="foreword.html">Foreword</a></li><li class="chapter-item expanded affix "><a href="getting-started.html" class="active">Getting Started</a></li><li class="chapter-item expanded "><a href="introduction/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="ble/index.html"><strong aria-hidden="true">2.</strong> Ballot Leader Election</a></li><li class="chapter-item expanded "><a href="omnipaxos/index.html"><strong aria-hidden="true">3.</strong> OmniPaxos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="omnipaxos/communication.html"><strong aria-hidden="true">3.1.</strong> Communication</a></li><li class="chapter-item expanded "><a href="omnipaxos/round.html"><strong aria-hidden="true">3.2.</strong> Round</a></li><li class="chapter-item expanded "><a href="omnipaxos/logging.html"><strong aria-hidden="true">3.3.</strong> Logging</a></li><li class="chapter-item expanded "><a href="omnipaxos/configuration.html"><strong aria-hidden="true">3.4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="omnipaxos/storage.html"><strong aria-hidden="true">3.5.</strong> Storage</a></li><li class="chapter-item expanded "><a href="omnipaxos/garbage-collection.html"><strong aria-hidden="true">3.6.</strong> Garbage Collection</a></li></ol></li><li class="chapter-item expanded "><a href="project.html">Project Info</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -149,18 +149,18 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
-<h2 id="setting-up-rust"><a class="header" href="#setting-up-rust">Setting up Rust</a></h2>
-<p>It is recommmended to run OmniPaxos on a <em>nightly</em> version of the rust toolchain.</p>
-<p>We recommend using the <a href="https://rustup.rs/">rustup</a> tool to easily install the latest nightly version of rust and keep it updated. Instructions should be on screen once rustup is downloaded.</p>
-<blockquote>
-<p><strong>Using the nightly toolchain:</strong> Rustup can be configured to default to the nightly toolchain by running <code>rustup default nightly</code>.</p>
-</blockquote>
+<!-- ## Setting up Rust
+It is recommended to run OmniPaxos on a *nightly* version of the Rust toolchain.
+
+We recommend using the [rustup](https://rustup.rs/) tool to easily install the latest nightly version of rust and keep it updated. Instructions should be on the screen once rustup is downloaded.
+
+> **Using the nightly toolchain:** Rustup can be configured to default to the nightly toolchain by running `rustup default nightly`. -->
 <h2 id="cargo"><a class="header" href="#cargo">Cargo</a></h2>
 <p>Add OmniPaxos to your cargo project as a dependency:</p>
 <pre><code class="language-toml">[dependencies]
 omnipaxos = &quot;LATEST_VERSION&quot;
 </code></pre>
-<p>The latest version can be found on <a href="https://crates.io/crates/omnipaxos">crates.io</a>.</p>
+<!-- The latest version can be found on [crates.io](https://crates.io/crates/omnipaxos). -->
 <h3 id="github-master"><a class="header" href="#github-master">Github master</a></h3>
 <p>You can also point cargo to the latest <a href="https://github.com/haraldng/omnipaxos">Github</a> master version, instead of a release.
 To do so add the following to your Cargo.toml instead:</p>

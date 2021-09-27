@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../foreword.html">Foreword</a></li><li class="chapter-item expanded affix "><a href="../getting-started.html">Getting Started</a></li><li class="chapter-item expanded "><a href="../introduction/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../introduction/components.html"><strong aria-hidden="true">1.1.</strong> Components</a></li></ol></li><li class="chapter-item expanded "><a href="../ble/index.html"><strong aria-hidden="true">2.</strong> Ballot-Leader Election</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../ble/configuration.html"><strong aria-hidden="true">2.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../ble/timer.html"><strong aria-hidden="true">2.2.</strong> Tick Timer</a></li></ol></li><li class="chapter-item expanded "><a href="../omnipaxos/index.html"><strong aria-hidden="true">3.</strong> OmniPaxos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../omnipaxos/communication.html"><strong aria-hidden="true">3.1.</strong> Communication</a></li><li class="chapter-item expanded "><a href="../omnipaxos/round.html"><strong aria-hidden="true">3.2.</strong> Round</a></li><li class="chapter-item expanded "><a href="../omnipaxos/logging.html" class="active"><strong aria-hidden="true">3.3.</strong> Logging</a></li><li class="chapter-item expanded "><a href="../omnipaxos/configuration.html"><strong aria-hidden="true">3.4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../omnipaxos/storage.html"><strong aria-hidden="true">3.5.</strong> Storage</a></li><li class="chapter-item expanded "><a href="../omnipaxos/garbage-collection.html"><strong aria-hidden="true">3.6.</strong> Garbage Collection</a></li></ol></li><li class="chapter-item expanded "><a href="../project.html">Project Info</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../foreword.html">Foreword</a></li><li class="chapter-item expanded affix "><a href="../getting-started.html">Getting Started</a></li><li class="chapter-item expanded "><a href="../introduction/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../ble/index.html"><strong aria-hidden="true">2.</strong> Ballot Leader Election</a></li><li class="chapter-item expanded "><a href="../omnipaxos/index.html"><strong aria-hidden="true">3.</strong> OmniPaxos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../omnipaxos/communication.html"><strong aria-hidden="true">3.1.</strong> Communication</a></li><li class="chapter-item expanded "><a href="../omnipaxos/round.html"><strong aria-hidden="true">3.2.</strong> Round</a></li><li class="chapter-item expanded "><a href="../omnipaxos/logging.html" class="active"><strong aria-hidden="true">3.3.</strong> Logging</a></li><li class="chapter-item expanded "><a href="../omnipaxos/configuration.html"><strong aria-hidden="true">3.4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../omnipaxos/storage.html"><strong aria-hidden="true">3.5.</strong> Storage</a></li><li class="chapter-item expanded "><a href="../omnipaxos/garbage-collection.html"><strong aria-hidden="true">3.6.</strong> Garbage Collection</a></li></ol></li><li class="chapter-item expanded "><a href="../project.html">Project Info</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -149,66 +149,11 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="logging"><a class="header" href="#logging">Logging</a></h1>
-<p>OmniPaxos uses the <a href="https://crates.io/crates/slog">slog</a> crate to provide system wide logging facilities. Logging works out of the box with a default asynchronous console and file logger implementation that roughly corresponds to the following setup code:</p>
-<pre><code class="language-rust edition2018 no_run noplaypen">let path = std::path::Path::new(file_path);
-let prefix = path.parent().unwrap();
-std::fs::create_dir_all(prefix).unwrap();
-
-let file = OpenOptions::new()
-    .create(true)
-    .write(true)
-    .truncate(true)
-    .open(file_path)
-    .unwrap();
-
-let term_decorator = slog_term::TermDecorator::new().build();
-let file_decorator = slog_term::PlainSyncDecorator::new(file);
-
-let term_fuse = slog_term::FullFormat::new(term_decorator).build().fuse();
-let file_fuse = slog_term::FullFormat::new(file_decorator).build().fuse();
-
-let both = Mutex::new(slog::Duplicate::new(term_fuse, file_fuse)).fuse();
-let both = slog_async::Async::new(both).build().fuse();
-let logger = slog::Logger::root(both, o!());
-</code></pre>
+<p>OmniPaxos uses the <a href="https://crates.io/crates/slog">slog</a> crate to provide system-wide logging facilities. Logging works out of the box with a default asynchronous console and file logger implementation.</p>
 <p>The actual logging levels are controlled via build features. The default features correspond to <code>max_level_trace</code> and <code>release_max_level_info</code>, that is in debug builds all levels are shown, while in the release profile only <code>info</code> and more severe message are shown.</p>
 <h2 id="custom-logger"><a class="header" href="#custom-logger">Custom Logger</a></h2>
 <p>Sometimes the default logging configuration is not sufficient for a particular application. For example, you might need a larger queue size in the <code>Async</code> drain, or you may want to write to a file instead of the terminal.</p>
-<p>In the following example we replace the default terminal logger with a file logger, logging to <code>/tmp/myloggingfile</code> instead. We also increase the queue size in the <code>Async</code> drain to 2048, so that it fits the 2048 logging events we are sending it short succession later. In order to replace the default logger, we give the logger as an argument to the OmniPaxos constructor.</p>
-<pre><code class="language-rust edition2018 no_run noplaypen">let logger = {
-    let file = OpenOptions::new()
-        .create(true)
-        .write(true)
-        .truncate(true)
-        .open(FILE_NAME)
-        .expect(&quot;logging file&quot;);
-
-    // create logger
-    let decorator = slog_term::PlainSyncDecorator::new(file);
-    let drain = slog_term::FullFormat::new(decorator).build().fuse();
-    let drain = slog_async::Async::new(drain).chan_size(2048).build().fuse();
-    slog::Logger::root_typed(
-        Arc::new(drain),
-        o!(
-        &quot;location&quot; =&gt; slog::PushFnValue(|r: &amp;slog::Record&lt;'_&gt;, ser: slog::PushFnValueSerializer&lt;'_&gt;| {
-            ser.emit(format_args!(&quot;{}:{}&quot;, r.file(), r.line()))
-        })),
-    )
-};
-
-let replica = OmniPaxos::with(
-    1,
-    pid,
-    peer_pids,
-    Storage::with(
-        MemorySequence::&lt;Ballot&gt;::new(),
-        MemoryState::&lt;Ballot&gt;::new(),
-    ),
-    None,
-    logger,
-    None,
-),
-</code></pre>
+<p>The user can provide a custom implementation based on <a href="https://crates.io/crates/slog"><strong>slog</strong></a>.</p>
 <blockquote>
 <p><strong>Note:</strong> The custom logger can be created for the <a href="../ble/index.html"><strong>Ballot Leader Election</strong></a> module as well.</p>
 </blockquote>

@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../foreword.html">Foreword</a></li><li class="chapter-item expanded affix "><a href="../getting-started.html">Getting Started</a></li><li class="chapter-item expanded "><a href="../introduction/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../introduction/components.html"><strong aria-hidden="true">1.1.</strong> Components</a></li></ol></li><li class="chapter-item expanded "><a href="../ble/index.html"><strong aria-hidden="true">2.</strong> Ballot-Leader Election</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../ble/configuration.html"><strong aria-hidden="true">2.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../ble/timer.html"><strong aria-hidden="true">2.2.</strong> Tick Timer</a></li></ol></li><li class="chapter-item expanded "><a href="../omnipaxos/index.html" class="active"><strong aria-hidden="true">3.</strong> OmniPaxos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../omnipaxos/communication.html"><strong aria-hidden="true">3.1.</strong> Communication</a></li><li class="chapter-item expanded "><a href="../omnipaxos/round.html"><strong aria-hidden="true">3.2.</strong> Round</a></li><li class="chapter-item expanded "><a href="../omnipaxos/logging.html"><strong aria-hidden="true">3.3.</strong> Logging</a></li><li class="chapter-item expanded "><a href="../omnipaxos/configuration.html"><strong aria-hidden="true">3.4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../omnipaxos/storage.html"><strong aria-hidden="true">3.5.</strong> Storage</a></li><li class="chapter-item expanded "><a href="../omnipaxos/garbage-collection.html"><strong aria-hidden="true">3.6.</strong> Garbage Collection</a></li></ol></li><li class="chapter-item expanded "><a href="../project.html">Project Info</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../foreword.html">Foreword</a></li><li class="chapter-item expanded affix "><a href="../getting-started.html">Getting Started</a></li><li class="chapter-item expanded "><a href="../introduction/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../ble/index.html"><strong aria-hidden="true">2.</strong> Ballot Leader Election</a></li><li class="chapter-item expanded "><a href="../omnipaxos/index.html" class="active"><strong aria-hidden="true">3.</strong> OmniPaxos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../omnipaxos/communication.html"><strong aria-hidden="true">3.1.</strong> Communication</a></li><li class="chapter-item expanded "><a href="../omnipaxos/round.html"><strong aria-hidden="true">3.2.</strong> Round</a></li><li class="chapter-item expanded "><a href="../omnipaxos/logging.html"><strong aria-hidden="true">3.3.</strong> Logging</a></li><li class="chapter-item expanded "><a href="../omnipaxos/configuration.html"><strong aria-hidden="true">3.4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../omnipaxos/storage.html"><strong aria-hidden="true">3.5.</strong> Storage</a></li><li class="chapter-item expanded "><a href="../omnipaxos/garbage-collection.html"><strong aria-hidden="true">3.6.</strong> Garbage Collection</a></li></ol></li><li class="chapter-item expanded "><a href="../project.html">Project Info</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -149,16 +149,35 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="omnipaxos"><a class="header" href="#omnipaxos">OmniPaxos</a></h1>
-<p>In this section we will introduce the features of OmniPaxos in detail.</p>
+<p>In this section, we will introduce the features of OmniPaxos in detail.</p>
 <p>In particular, we will talk about <a href="communication.html">communication</a>, <a href="round.html">round</a>, as well as how to <a href="configuration.html">configure</a> it, before describing some of the advanced options for Omnipaxos, such as <a href="garbage-collection.html">garbage collection</a>, <a href="logging.html">logging</a>, and <a href="storage.html">storage</a>.</p>
-<p>As the library is based on the <a href="https://arxiv.org/pdf/2008.13456.pdf">Leader-based Sequence Paxos</a> algorithm we will give an onverview of the properties it has to adhere to.</p>
-<p>The Leader-Based Sequence Consensus algorithm is used to achieve replication inside of a partition. It ensures that a leader, which is elected utilising a different component, proposes an operation and it will be committed only when a consensus is achieved by the majority. At the same time a sequence is stored inside each replica. By utilising a leader we assure that only one operation will be decided at a point in time which also ensures the linearizability of the system.</p>
+<p>An OmniPaxos replica maintains a local state of the replicated log, handles incoming messages and produces outgoing messages that the user has to fetch periodically and send using a network implementation.
+The user also has to periodically fetch the decided entries that are guaranteed to be strongly consistent and linearizable, and therefore also safe to be used in the higher-level application.</p>
+<p>An OmniPaxos replica can be initialised by calling one of the two constructors. The second constructor uses a hocon configuration which will be discussed in further detail in <a href="../omnipaxos/configuration.html">configuration</a>.</p>
+<pre><code class="language-rust edition2018 no_run noplaypen">OmniPaxos::with(
+    config_id: u32,
+    pid: u64,
+    peers: Vec&lt;u64&gt;,
+    storage: Storage&lt;R, S, P&gt;,
+    skip_prepare_use_leader: Option&lt;Leader&lt;R&gt;&gt;,
+    logger: Option&lt;Logger&gt;,
+    log_file_path: Option&lt;&amp;str&gt;,
+)
+
+OmniPaxos::with_hocon(
+    cfg: &amp;Hocon,
+    peers: Vec&lt;u64&gt;,
+    storage: Storage&lt;R, S, P&gt;,
+    skip_prepare_use_leader: Option&lt;Leader&lt;R&gt;&gt;,
+    logger: Option&lt;Logger&gt;,
+)
+</code></pre>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
-                                                    <a rel="prev" href="../ble/timer.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                                    <a rel="prev" href="../ble/index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
@@ -172,7 +191,7 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
-                                    <a rel="prev" href="../ble/timer.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                    <a rel="prev" href="../ble/index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 

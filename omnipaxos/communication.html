@@ -84,7 +84,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../foreword.html">Foreword</a></li><li class="chapter-item expanded affix "><a href="../getting-started.html">Getting Started</a></li><li class="chapter-item expanded "><a href="../introduction/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../introduction/components.html"><strong aria-hidden="true">1.1.</strong> Components</a></li></ol></li><li class="chapter-item expanded "><a href="../ble/index.html"><strong aria-hidden="true">2.</strong> Ballot-Leader Election</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../ble/configuration.html"><strong aria-hidden="true">2.1.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../ble/timer.html"><strong aria-hidden="true">2.2.</strong> Tick Timer</a></li></ol></li><li class="chapter-item expanded "><a href="../omnipaxos/index.html"><strong aria-hidden="true">3.</strong> OmniPaxos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../omnipaxos/communication.html" class="active"><strong aria-hidden="true">3.1.</strong> Communication</a></li><li class="chapter-item expanded "><a href="../omnipaxos/round.html"><strong aria-hidden="true">3.2.</strong> Round</a></li><li class="chapter-item expanded "><a href="../omnipaxos/logging.html"><strong aria-hidden="true">3.3.</strong> Logging</a></li><li class="chapter-item expanded "><a href="../omnipaxos/configuration.html"><strong aria-hidden="true">3.4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../omnipaxos/storage.html"><strong aria-hidden="true">3.5.</strong> Storage</a></li><li class="chapter-item expanded "><a href="../omnipaxos/garbage-collection.html"><strong aria-hidden="true">3.6.</strong> Garbage Collection</a></li></ol></li><li class="chapter-item expanded "><a href="../project.html">Project Info</a></li></ol>            </div>
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../foreword.html">Foreword</a></li><li class="chapter-item expanded affix "><a href="../getting-started.html">Getting Started</a></li><li class="chapter-item expanded "><a href="../introduction/index.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li class="chapter-item expanded "><a href="../ble/index.html"><strong aria-hidden="true">2.</strong> Ballot Leader Election</a></li><li class="chapter-item expanded "><a href="../omnipaxos/index.html"><strong aria-hidden="true">3.</strong> OmniPaxos</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="../omnipaxos/communication.html" class="active"><strong aria-hidden="true">3.1.</strong> Communication</a></li><li class="chapter-item expanded "><a href="../omnipaxos/round.html"><strong aria-hidden="true">3.2.</strong> Round</a></li><li class="chapter-item expanded "><a href="../omnipaxos/logging.html"><strong aria-hidden="true">3.3.</strong> Logging</a></li><li class="chapter-item expanded "><a href="../omnipaxos/configuration.html"><strong aria-hidden="true">3.4.</strong> Configuration</a></li><li class="chapter-item expanded "><a href="../omnipaxos/storage.html"><strong aria-hidden="true">3.5.</strong> Storage</a></li><li class="chapter-item expanded "><a href="../omnipaxos/garbage-collection.html"><strong aria-hidden="true">3.6.</strong> Garbage Collection</a></li></ol></li><li class="chapter-item expanded "><a href="../project.html">Project Info</a></li></ol>            </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
 
@@ -151,29 +151,17 @@
                         <h1 id="communication"><a class="header" href="#communication">Communication</a></h1>
 <p>By default, OmniPaxos does not implement any network dispatcher. It is up to the user to provide an implementation of the network.</p>
 <p>Let us assume we have a network dispatcher courtesy of <a href="https://github.com/kompics/kompact">Kompact</a>.</p>
-<pre><code class="language-rust edition2018 no_run noplaypen">peers: HashMap&lt;u64, ActorRef&lt;BLEMessage&gt;&gt;,
-
-fn send_outgoing_msgs(&amp;mut self) {
-    let outgoing = self.paxos.get_outgoing_msgs();
-
-    for out in outgoing {
-        let receiver = self.peers.get(&amp;out.to).unwrap();
-
-        receiver.tell(out);
+<pre><code class="language-rust edition2018 no_run noplaypen">// Create a timer that triggers once every 1ms
+// Get the outgoing messages and send them through the network to the receivers
+timer = create_timer(1ms, {
+    let msgs = paxos.get_outgoing_msgs();
+    for out_msg in msgs {
+        let receiver = out_msg.to;
+        // send out_msg to receiver
     }
-}
-
-self.schedule_periodic(
-    Duration::from_millis(1),
-    Duration::from_millis(1),
-    move |c, _| {
-        c.send_outgoing_msgs();
-
-        Handled::Ok
-    },
-)
+})
 </code></pre>
-<p>In the example above we schedule a timer once every 1ms to extract a vector of messages (outgoing queue) from inside of a paxos replica, then we iterate through each message and send it through the network to the target replica.</p>
+<p>In the example above we schedule a timer once every 1ms to extract a vector of messages (outgoing queue) from inside of a Paxos replica, then we iterate through each message and send it through the network to the target replica.</p>
 
                     </main>
 
