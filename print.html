@@ -284,7 +284,6 @@ OmniPaxos::with_hocon(
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="communication"><a class="header" href="#communication">Communication</a></h1>
 <p>By default, OmniPaxos does not implement any network dispatcher. It is up to the user to provide an implementation of the network.</p>
-<p>Let us assume we have a network dispatcher courtesy of <a href="https://github.com/kompics/kompact">Kompact</a>.</p>
 <pre><code class="language-rust edition2018 no_run noplaypen">// Create a timer that triggers once every 1ms
 // Get the outgoing messages and send them through the network to the receivers
 timer = create_timer(1ms, {
@@ -387,7 +386,8 @@ where
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="garbage-collection"><a class="header" href="#garbage-collection">Garbage Collection</a></h1>
 <p>In some cases, the decided sequence can become very large and a portion of the sequence needs to be deleted. To solve this Omnipaxos offers a manual garbage collection.</p>
-<pre><code class="language-rust edition2018 no_run noplaypen">// `index` - Deletes all entries up to index, if the index is None then the minimum index accepted by ALL servers will be used as the index.
+<pre><code class="language-rust edition2018 no_run noplaypen">// `index` - Deletes all entries up to index, if the index is None then the 
+// minimum index accepted by ALL servers will be used as the index.
 crate::omnipaxos::OmniPaxos::garbage_collect(index)
 </code></pre>
 <p>The function can be called from any replica. If the replica which initiates the garbage collection is not the leader then it will redirect the proposal for garbage collection to the leader which in turn will initiate the garbage collection for all the replicas in the system.</p>

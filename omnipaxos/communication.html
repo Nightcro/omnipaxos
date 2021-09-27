@@ -150,7 +150,6 @@
                     <main>
                         <h1 id="communication"><a class="header" href="#communication">Communication</a></h1>
 <p>By default, OmniPaxos does not implement any network dispatcher. It is up to the user to provide an implementation of the network.</p>
-<p>Let us assume we have a network dispatcher courtesy of <a href="https://github.com/kompics/kompact">Kompact</a>.</p>
 <pre><code class="language-rust edition2018 no_run noplaypen">// Create a timer that triggers once every 1ms
 // Get the outgoing messages and send them through the network to the receivers
 timer = create_timer(1ms, {
