@@ -174,7 +174,7 @@ BallotLeaderElection::with_hocon(
 )
 </code></pre>
 <h2 id="tick-timer"><a class="header" href="#tick-timer">Tick Timer</a></h2>
-<p>The <strong>Ballot Leader Election</strong> does not use timers as there is no available implementation in the official library of Rust. To overcome the use of external libraries the BLE module offers an implementation based on ticks.</p>
+<p>The <strong>Ballot Leader Election</strong> has an internal logical clock that is driven by a tick() function.</p>
 <p>In the example below, we have a timer that repeats the provided function once every 100ms and the heartbeat delay would be 5 ticks, then the heartbeat timeout would happen once every 500ms.</p>
 <pre><code class="language-rust edition2018 no_run noplaypen">// Create a timer that triggers once every 100ms
 // Call method tick() from ble and check if there is a leader event
